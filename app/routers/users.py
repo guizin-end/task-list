@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
 from app.models import User
-from app.schemas import UserPublic, UserSchema
+from app.schemas import UserPublic, UserSchema, UserUpdate
 
 router = APIRouter(prefix='/users', tags=['users'])
 
@@ -54,7 +54,7 @@ async def get_user_by_id(user_id: str, session: Session):
 
 
 @router.patch('/{user_id}')
-async def update_user(user_id: str, user: UserSchema, session: Session):
+async def update_user(user_id: str, user: UserUpdate, session: Session):
     db_user = await session.scalar(select(User).where(User.id == user_id))
 
     if not db_user:
