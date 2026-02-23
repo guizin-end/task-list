@@ -89,4 +89,4 @@ async def delete_user(user_id: str, session: Session):
     await session.delete(db_user)
     await session.commit()
 
-    return {'msg': 'User deleted'}
+    return {'detail': 'User deleted.'}
