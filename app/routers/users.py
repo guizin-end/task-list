@@ -43,7 +43,7 @@ async def get_users(session: Session):
 
 @router.get('/{user_id}', response_model=UserPublic)
 async def get_user_by_id(user_id: str, session: Session):
-    db_user = session.scalar(select(User).where(User.id == user_id))
+    db_user = await session.scalar(select(User).where(User.id == user_id))
 
     if not db_user:
         raise HTTPException(
@@ -79,7 +79,7 @@ async def update_user(user_id: str, user: UserSchema, session: Session):
 
 @router.delete('/{user_id}')
 async def delete_user(user_id: str, session: Session):
-    db_user = session.scalar(select(User).where(User.id == user_id))
+    db_user = await session.scalar(select(User).where(User.id == user_id))
 
     if not db_user:
         raise HTTPException(
