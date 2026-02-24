@@ -53,8 +53,8 @@ async def get_user_by_id(user_id: str, session: Session):
     return db_user
 
 
-@router.patch('/{user_id}')
-async def update_user(user_id: str, user: UserUpdate, session: Session):
+@router.put('/{user_id}', response_model=UserPublic)
+async def update_user(user_id: str, new_user: UserSchema, session: Session):
     db_user = await session.scalar(select(User).where(User.id == user_id))
 
     if not db_user:
@@ -63,7 +63,31 @@ async def update_user(user_id: str, user: UserUpdate, session: Session):
         )
 
     try:
-        for key, value in user.model_dump(exclude_none=True).items():
+        for key, value in new_user.model_dump().items():
+            setattr(db_user, key, value)
+
+        await session.commit()
+        await session.refresh(db_user)
+
+        return db_user
+
+    except IntegrityError:
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT, detail='User already exists.'
+        )
+
+
+@router.patch('/{user_id}', response_model=UserPublic)
+async def partial_update_user(user_id: str, user: UserUpdate, session: Session):
+    db_user = await session.scalar(select(User).where(User.id == user_id))
+
+    if not db_user:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='User does not exist.'
+        )
+
+    try:
+        for key, value in user.model_dump(exclude_unset=True).items():
             setattr(db_user, key, value)
 
         await session.commit()
