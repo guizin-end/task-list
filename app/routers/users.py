@@ -10,10 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_session
 from app.models import User
 from app.schemas import UserPublic, UserSchema, UserUpdate
+from app.security import get_current_user, get_password_hash
 
 router = APIRouter(prefix='/users', tags=['users'])
 
 Session = Annotated[AsyncSession, Depends(get_session)]
+Current_User = Annotated[User, Depends(get_current_user)]
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
@@ -22,8 +24,9 @@ async def create_user(new_user: UserSchema, session: Session):
         id=str(uuid4()),
         username=new_user.username,
         email=new_user.email,
-        password=new_user.password,
+        password=get_password_hash(new_user.password),
     )
+
     try:
         session.add(db_user)
         await session.commit()
@@ -41,6 +44,11 @@ async def get_users(session: Session):
     return await session.scalars(select(User))
 
 
+@router.get('/me', response_model=UserPublic)
+async def get_me(current_user: Current_User):
+    return current_user
+
+
 @router.get('/{user_id}', response_model=UserPublic)
 async def get_user_by_id(user_id: str, session: Session):
     db_user = await session.scalar(select(User).where(User.id == user_id))
@@ -54,8 +62,15 @@ async def get_user_by_id(user_id: str, session: Session):
 
 
 @router.put('/{user_id}', response_model=UserPublic)
-async def update_user(user_id: str, new_user: UserSchema, session: Session):
-    db_user = await session.scalar(select(User).where(User.id == user_id))
+async def update_user(
+    user_id: str, new_user: UserSchema, session: Session, current_user: Current_User
+):
+    db_user = await session.scalar(
+        select(User).where(
+            User.id == user_id,
+            User.id == current_user.id,
+        )
+    )
 
     if not db_user:
         raise HTTPException(
@@ -78,8 +93,15 @@ async def update_user(user_id: str, new_user: UserSchema, session: Session):
 
 
 @router.patch('/{user_id}', response_model=UserPublic)
-async def partial_update_user(user_id: str, user: UserUpdate, session: Session):
-    db_user = await session.scalar(select(User).where(User.id == user_id))
+async def partial_update_user(
+    user_id: str, user: UserUpdate, session: Session, current_user: Current_User
+):
+    db_user = await session.scalar(
+        select(User).where(
+            User.id == user_id,
+            User.id == current_user.id,
+        )
+    )
 
     if not db_user:
         raise HTTPException(
@@ -102,8 +124,13 @@ async def partial_update_user(user_id: str, user: UserUpdate, session: Session):
 
 
 @router.delete('/{user_id}')
-async def delete_user(user_id: str, session: Session):
-    db_user = await session.scalar(select(User).where(User.id == user_id))
+async def delete_user(user_id: str, session: Session, current_user: Current_User):
+    db_user = await session.scalar(
+        select(User).where(
+            User.id == user_id,
+            User.id == current_user.id,
+        )
+    )
 
     if not db_user:
         raise HTTPException(
