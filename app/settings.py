@@ -1,16 +1,19 @@
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file='.env')
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
 
     POSTGRES_USER: str
     POSTGRES_DB: str
     POSTGRES_PASSWORD: str
 
-    DATABASE_URL: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, gt=0)
+    SECRET_KEY: str
+    ALGORITHM: str
 
 
 @lru_cache()
