@@ -79,7 +79,11 @@ async def update_user(
 
     try:
         for key, value in new_user.model_dump().items():
-            setattr(db_user, key, value)
+            if key == 'password':
+                setattr(db_user, key, get_password_hash(value))
+
+            else:
+                setattr(db_user, key, value)
 
         await session.commit()
         await session.refresh(db_user)
@@ -110,7 +114,11 @@ async def partial_update_user(
 
     try:
         for key, value in user.model_dump(exclude_unset=True).items():
-            setattr(db_user, key, value)
+            if key == 'password':
+                setattr(db_user, key, get_password_hash(value))
+
+            else:
+                setattr(db_user, key, value)
 
         await session.commit()
         await session.refresh(db_user)
