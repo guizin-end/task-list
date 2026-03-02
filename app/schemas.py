@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 from app.models import TodoStatus
 
@@ -34,3 +34,8 @@ class TodoPublic(TodoSchema):
 class TodoUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
+
+
+class FilterParams(BaseModel):
+    limit: int = Field(100, gt=0, le=100)
+    offset: int = Field(0, ge=0)
