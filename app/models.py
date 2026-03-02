@@ -4,7 +4,7 @@ import enum
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import ForeignKey, UniqueConstraint, func
+from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
 table_registry = registry()
@@ -57,13 +57,12 @@ class TodoStatusCreate(str, enum.Enum):
 @table_registry.mapped_as_dataclass
 class Todo:
     __tablename__ = 'todos'
-    __table_args__ = (UniqueConstraint('user_id', 'title', name='uq_todos_user_title'),)
 
     id: Mapped[str] = mapped_column(primary_key=True)
     user_id: Mapped[str] = mapped_column(ForeignKey('users.id'))
 
-    title: Mapped[str] = mapped_column()
-    description: Mapped[str] = mapped_column()
+    title: Mapped[str] = mapped_column(nullable=False)
+    description: Mapped[str] = mapped_column(nullable=True)
     status: Mapped[TodoStatus] = mapped_column(
         default=TodoStatus.DRAFT,
         server_default=TodoStatus.DRAFT,
