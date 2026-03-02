@@ -65,8 +65,8 @@ class Todo:
     title: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column()
     status: Mapped[TodoStatus] = mapped_column(
-        default=TodoStatus.PENDING,
-        server_default=TodoStatus.PENDING,
+        default=TodoStatus.DRAFT,
+        server_default=TodoStatus.DRAFT,
     )
 
     created_at: Mapped[datetime] = mapped_column(init=False, server_default=func.now())
