@@ -28,6 +28,20 @@ users_payload = [
 ]
 
 
+todos_payload = [
+    {
+        'title': 'todo 1',
+        'description': 'description example 1',
+        'status': 'PENDING',
+    },
+    {
+        'title': 'todo 2',
+        'description': 'description example 2',
+        'status': 'PENDING',
+    },
+]
+
+
 @pytest_asyncio.fixture
 async def session():
     engine = create_async_engine(
@@ -127,3 +141,26 @@ def mock_decode_payload_with_mock_username(monkeypatch):
         return {'sub': 'mock_email@mock.com'}
 
     monkeypatch.setattr('app.security.jwt.decode', fake_decode_payload)
+
+
+def create_todo(payload, client, auth_headers):
+    response = client.post(
+        f'/todos/?status={payload["status"]}',
+        json={
+            'title': payload['title'],
+            'description': payload['description'],
+        },
+        headers=auth_headers,
+    )
+
+    return response.json()
+
+
+@pytest_asyncio.fixture
+async def todo(client, auth_headers):
+    return create_todo(todos_payload[0], client, auth_headers)
+
+
+@pytest_asyncio.fixture
+async def other_todo(client, auth_headers):
+    return create_todo(todos_payload[1], client, auth_headers)
