@@ -51,7 +51,10 @@ async def get_todos(
     for key, value in filter_query.model_dump(
         exclude_none=True, exclude={'limit', 'offset'}
     ).items():
-        params.append(getattr(Todo, key) == getattr(filter_query, key))
+        if key == 'title':
+            params.append(getattr(Todo, key).contains(getattr(filter_query, key)))
+        else:
+            params.append(getattr(Todo, key) == getattr(filter_query, key))
 
     return await session.scalars(
         select(Todo)
@@ -86,6 +89,7 @@ async def empty_trash(
         )
     )
     await session.commit()
+    # TODO: implement 30 days auto exclusion with rabbitmq, celery e redis
 
 
 @router.patch('/{todo_id_or_title}/status', response_model=TodoPublic)  # noqa: FAST003
