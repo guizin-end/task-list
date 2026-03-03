@@ -27,6 +27,6 @@ async def get_valid_todo(
     )
 
     if not db_todo:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND)
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='Todo not found.')
 
     return db_todo
