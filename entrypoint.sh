@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-poetry run alembic upgrade head
+alembic upgrade head
