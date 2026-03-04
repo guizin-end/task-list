@@ -6,7 +6,6 @@ COPY . .
 
 RUN pip install poetry
 
-RUN poetry lock
 RUN poetry config installer.max-workers 10
 RUN poetry install --no-interaction --no-ansi
 
