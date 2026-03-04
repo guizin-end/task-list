@@ -17,7 +17,7 @@ services:
 
   app:
     image: app
-    entrypoint: ./entrypoint.sh
+    entrypoint: /app/entrypoint.sh
     build: .
     ports:
       - "8000:8000"
