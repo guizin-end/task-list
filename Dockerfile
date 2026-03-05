@@ -9,6 +9,11 @@ RUN pip install poetry
 RUN poetry config installer.max-workers 10
 RUN poetry install --no-interaction --no-ansi
 
-RUN chmod +x entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+RUN addgroup --system app \
+    && adduser --system --ingroup app --home /home/app app \
+    && chown -R app:app /app /home/app
+
+USER app
 
 EXPOSE 8000
