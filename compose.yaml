@@ -15,6 +15,24 @@ services:
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/mnesia/
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
   app:
     image: app
     entrypoint: /app/entrypoint.sh
@@ -25,10 +43,16 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
     env_file:
       - .env
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:?missing}:${POSTGRES_PASSWORD:?missing}@database:5432/${POSTGRES_DB:?missing}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
     volumes:
       # Python
       - ./app:/app/app
@@ -41,5 +65,48 @@ services:
       - ./alembic:/app/alembic
       - ./alembic.ini:/app/alembic.ini
 
+  celery_worker:
+    image: app
+    build: .
+    command: celery -A app.tasks.celery_app.celery_app worker --loglevel=info
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:?missing}:${POSTGRES_PASSWORD:?missing}@database:5432/${POSTGRES_DB:?missing}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+    volumes:
+      - ./app:/app/app
+      - ./tests:/app/tests
+
+  celery_beat:
+    image: app
+    build: .
+    command: celery -A app.tasks.celery_app.celery_app beat --loglevel=info --schedule /tmp/celerybeat-schedule
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:?missing}:${POSTGRES_PASSWORD:?missing}@database:5432/${POSTGRES_DB:?missing}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+    volumes:
+      - ./app:/app/app
+      - ./tests:/app/tests
+
 volumes:
   pgdata:
+  rabbitmq_data:

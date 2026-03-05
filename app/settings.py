@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
 
+    RABBITMQ_DEFAULT_USER: str
+    RABBITMQ_DEFAULT_PASS: str
+
+    CELERY_BROKER_URL: str
+    CELERY_RESULT_BACKEND: str
+
 
 @lru_cache()
 def get_settings() -> Settings:
