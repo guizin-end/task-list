@@ -78,7 +78,7 @@ async def get_deleted_todos(
 
 
 @router.delete('/trash', status_code=HTTPStatus.NO_CONTENT)
-async def empty_trash(
+async def empty_user_todo_trash(
     session: Session,
     current_user: Current_User,
 ):
@@ -89,7 +89,6 @@ async def empty_trash(
         )
     )
     await session.commit()
-    # TODO: implement 30 days auto exclusion with rabbitmq, celery e redis
 
 
 @router.patch('/{todo_id_or_title}/status', response_model=TodoPublic)  # noqa: FAST003

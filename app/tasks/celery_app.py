@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from celery import Celery
 
 from app.settings import Settings
@@ -15,4 +17,10 @@ celery_app.conf.update(
     enable_utc=True,
     task_acks_late=True,
     task_reject_on_worker_lost=True,
+    beat_schedule={
+        'cleanup_tasks': {
+            'task': 'app.celery_app.cleanup_tasks.trash_cleaner',
+            'schedule': timedelta(days=settings.TODO_TRASH_CLEANUP_INTERVAL_DAYS),
+        }
+    },
 )
