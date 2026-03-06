@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str
     CELERY_RESULT_BACKEND: str
 
+    TODO_TRASH_EXPIRE_DAYS: int
+    TODO_TRASH_CLEANUP_INTERVAL_DAYS: int
+
 
 @lru_cache()
 def get_settings() -> Settings:
