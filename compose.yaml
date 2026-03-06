@@ -37,6 +37,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    volumes:
+    - redis_data:/data
 
   app:
     image: app
@@ -114,4 +116,5 @@ services:
 
 volumes:
   pgdata:
+  redis_data:
   rabbitmq_data:
