@@ -19,7 +19,7 @@ celery_app.conf.update(
     task_reject_on_worker_lost=True,
     beat_schedule={
         'cleanup_tasks': {
-            'task': 'app.celery_app.cleanup_tasks.trash_cleaner',
+            'task': 'app.tasks.cleanup_tasks.trash_cleaner',
             'schedule': timedelta(days=settings.TODO_TRASH_CLEANUP_INTERVAL_DAYS),
         }
     },
