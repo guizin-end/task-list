@@ -44,4 +44,4 @@ class FilterParams(BaseModel):
 class FilterParamsTodos(FilterParams):
     title: str | None = Field(None, min_length=3, max_length=20)
     description: str | None = Field(None, max_length=20)
-    state: TodoStatusPublic | None = None
+    status: TodoStatusPublic | None = None
