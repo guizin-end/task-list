@@ -45,7 +45,7 @@ todos_payload = [
 @pytest_asyncio.fixture
 async def session():
     engine = create_async_engine(
-        url='sqlite+aiosqlite:///:memory:',
+        url=os.environ.get('DATABASE_URL'),
         connect_args={'check_same_thread': False},
         poolclass=StaticPool,
     )
