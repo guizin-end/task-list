@@ -3,7 +3,9 @@ import os
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 os.environ.setdefault('DATABASE_URL', 'sqlite+aiosqlite:///tests/test.db')
@@ -40,6 +42,27 @@ todos_payload = [
         'status': 'PENDING',
     },
 ]
+
+
+@pytest.fixture
+def mock_sync_session_for_tasks(monkeypatch):
+    database_url = os.environ.get('DATABASE_URL').replace('+aiosqlite', '')
+
+    engine = create_engine(
+        url=database_url,
+        connect_args={'check_same_thread': False},
+        poolclass=StaticPool,
+    )
+
+    test_sync_session = sessionmaker(bind=engine, expire_on_commit=False)
+
+    monkeypatch.setattr(
+        'app.tasks.cleanup_tasks.sync_session_factory', test_sync_session
+    )
+
+    yield
+
+    engine.dispose()
 
 
 @pytest_asyncio.fixture
@@ -166,3 +189,13 @@ async def todo(client, auth_headers):
 @pytest_asyncio.fixture
 async def other_todo(client, auth_headers):
     return create_todo(todos_payload[1], client, auth_headers)
+
+
+@pytest_asyncio.fixture
+async def delete_todo(client, auth_headers, todo):
+    response = client.delete(
+        f'/todos/{todo["id"]}',
+        headers=auth_headers,
+    )
+
+    return response
