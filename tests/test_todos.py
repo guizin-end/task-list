@@ -56,20 +56,38 @@ def test_get_todos_with_other_filter(client, auth_headers):
     )
 
 
-def test_get_deleted_todos(client, auth_headers):
+def test_get_deleted_todos(client, delete_todo, auth_headers):
     response = client.get(
         '/todos/trash',
         headers=auth_headers,
     )
     assert response.status_code == HTTPStatus.OK
+    assert all(
+        isinstance(TodoPublic.model_validate(todo), TodoPublic)
+        for todo in response.json()
+    )
 
 
-def test_empty_trash(client, auth_headers):
+def test_empty_trash(client, delete_todo, auth_headers):
+    response = client.get(
+        '/todos/trash',
+        headers=auth_headers,
+    )
+    assert response.status_code == HTTPStatus.OK
+    assert len(response.json()) == 1
+
     response = client.delete(
         '/todos/trash',
         headers=auth_headers,
     )
     assert response.status_code == HTTPStatus.NO_CONTENT
+
+    response = client.get(
+        '/todos/trash',
+        headers=auth_headers,
+    )
+    assert response.status_code == HTTPStatus.OK
+    assert len(response.json()) == 0
 
 
 def test_update_todo_status(client, todo, auth_headers):
