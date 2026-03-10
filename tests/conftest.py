@@ -59,6 +59,8 @@ async def session():
     async with engine.connect() as conn:
         await conn.run_sync(table_registry.metadata.drop_all)
 
+    await engine.dispose()
+
 
 @pytest_asyncio.fixture
 async def client(session):
