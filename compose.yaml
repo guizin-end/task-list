@@ -77,7 +77,6 @@ services:
 
   celery_worker:
     image: app
-    build: .
     command: celery -A app.tasks.celery_app.celery_app worker --loglevel=info
     depends_on:
       database:
@@ -98,7 +97,6 @@ services:
 
   celery_beat:
     image: app
-    build: .
     command: celery -A app.tasks.celery_app.celery_app beat --loglevel=info --schedule /tmp/celerybeat-schedule
     depends_on:
       database:
