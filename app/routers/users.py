@@ -61,43 +61,8 @@ async def get_user_by_id(user_id: str, session: Session):
     return db_user
 
 
-@router.put('/{user_id}', response_model=UserPublic)
-async def update_user(
-    user_id: str, new_user: UserSchema, session: Session, current_user: Current_User
-):
-    db_user = await session.scalar(
-        select(User).where(
-            User.id == user_id,
-            User.id == current_user.id,
-        )
-    )
-
-    if not db_user:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User does not exist.'
-        )
-
-    try:
-        for key, value in new_user.model_dump().items():
-            if key == 'password':
-                setattr(db_user, key, get_password_hash(value))
-
-            else:
-                setattr(db_user, key, value)
-
-        await session.commit()
-        await session.refresh(db_user)
-
-        return db_user
-
-    except IntegrityError:
-        raise HTTPException(
-            status_code=HTTPStatus.CONFLICT, detail='User already exists.'
-        )
-
-
 @router.patch('/{user_id}', response_model=UserPublic)
-async def partial_update_user(
+async def update_user(
     user_id: str, user: UserUpdate, session: Session, current_user: Current_User
 ):
     db_user = await session.scalar(
