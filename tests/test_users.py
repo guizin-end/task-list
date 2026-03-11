@@ -83,60 +83,7 @@ def test_get_user_by_id_not_found(client):
     assert response.json() == {'detail': 'User does not exist.'}
 
 
-def test_update_user(client, user, auth_headers):
-    response = client.put(
-        f'/users/{user["id"]}',
-        json=users_payload[1],
-        headers=auth_headers,
-    )
-
-    assert response.status_code == HTTPStatus.OK
-    assert isinstance(response.json(), dict)
-    assert isinstance(UserPublic.model_validate(response.json()), UserPublic)
-    assert response.json().get('username') == users_payload[1]['username']
-
-
-def test_update_user_username_conflict(client, user, other_user, auth_headers):
-    response = client.put(
-        f'/users/{user["id"]}',
-        json={
-            'username': other_user['username'],
-            'email': 'new_email@example.com',
-            'password': 'secret',
-        },
-        headers=auth_headers,
-    )
-
-    assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json() == {'detail': 'User already exists.'}
-
-
-def test_update_user_email_conflict(client, user, other_user, auth_headers):
-    response = client.put(
-        f'/users/{user["id"]}',
-        json={
-            'username': 'db_users[0]name',
-            'email': other_user['email'],
-            'password': 'secret',
-        },
-        headers=auth_headers,
-    )
-
-    assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json() == {'detail': 'User already exists.'}
-
-
-def test_update_user_not_found(client, user, mock_get_current_user):
-    response = client.put(
-        '/users/false-id-1',
-        json=users_payload[1],
-    )
-
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'User does not exist.'}
-
-
-def test_partial_update_user_username(client, user, auth_headers):
+def test_update_user_username(client, user, auth_headers):
     response = client.patch(
         f'/users/{user["id"]}',
         json={
@@ -150,7 +97,7 @@ def test_partial_update_user_username(client, user, auth_headers):
     assert isinstance(UserPublic.model_validate(response.json()), UserPublic)
 
 
-def test_partial_update_user_email(client, user, auth_headers):
+def test_update_user_email(client, user, auth_headers):
     response = client.patch(
         f'/users/{user["id"]}',
         json={
@@ -164,7 +111,7 @@ def test_partial_update_user_email(client, user, auth_headers):
     assert isinstance(UserPublic.model_validate(response.json()), UserPublic)
 
 
-def test_partial_update_user_password(client, user, auth_headers):
+def test_update_user_password(client, user, auth_headers):
     response = client.patch(
         f'/users/{user["id"]}',
         json={
@@ -178,7 +125,7 @@ def test_partial_update_user_password(client, user, auth_headers):
     assert isinstance(UserPublic.model_validate(response.json()), UserPublic)
 
 
-def test_partial_update_user_username_conflict(client, user, other_user, auth_headers):
+def test_update_user_username_conflict(client, user, other_user, auth_headers):
     response = client.patch(
         f'/users/{user["id"]}',
         json={
@@ -193,7 +140,7 @@ def test_partial_update_user_username_conflict(client, user, other_user, auth_he
     assert response.json() == {'detail': 'User already exists.'}
 
 
-def test_partial_update_user_email_conflict(client, user, other_user, auth_headers):
+def test_update_user_email_conflict(client, user, other_user, auth_headers):
     response = client.patch(
         f'/users/{user["id"]}',
         json={
@@ -208,7 +155,7 @@ def test_partial_update_user_email_conflict(client, user, other_user, auth_heade
     assert response.json() == {'detail': 'User already exists.'}
 
 
-def test_partial_update_user_not_found(
+def test_update_user_not_found(
     client,
     mock_get_current_user,
 ):
