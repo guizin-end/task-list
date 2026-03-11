@@ -1,6 +1,5 @@
-from datetime import timedelta
-
 from celery import Celery
+from celery.schedules import crontab
 
 from app.settings import Settings
 
@@ -20,7 +19,11 @@ celery_app.conf.update(
     beat_schedule={
         'cleanup_tasks': {
             'task': 'app.tasks.cleanup_tasks.trash_cleaner',
-            'schedule': timedelta(days=settings.TODO_TRASH_CLEANUP_INTERVAL_DAYS),
+            'schedule': crontab(
+                hour=0,
+                minute=0,
+                day_of_month=f'*/{settings.TODO_TRASH_CLEANUP_INTERVAL_DAYS}',
+            ),
         }
     },
 )
