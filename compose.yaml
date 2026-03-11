@@ -127,6 +127,24 @@ services:
       - ./app:/app/app
       - ./tests:/app/tests
 
+  flower:
+    image: app
+    command: celery -A app.tasks.celery_app.celery_app flower --logging=info
+    ports:
+      - "5555:5555"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:?missing}:${POSTGRES_PASSWORD:?missing}@database:5432/${POSTGRES_DB:?missing}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      FLOWER_UNAUTHENTICATED_API: "true"
+
 volumes:
   pgdata:
   redis_data:
