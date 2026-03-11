@@ -30,3 +30,11 @@ async def login_for_access_token(form_data: AuthForm, session: Session):
         'access_token': create_access_token(data={'sub': user.email}),
         'token_type': 'bearer',
     }
+
+
+@router.get('/token')
+async def refresh_access_token(current_user: CurrentUser):
+    return {
+        'access_token': create_access_token(data={'sub': current_user.email}),
+        'token_type': 'bearer',
+    }
