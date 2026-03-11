@@ -27,6 +27,9 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq/mnesia/
     healthcheck:
       test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   redis:
     image: redis:7-alpine
