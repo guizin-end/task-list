@@ -96,7 +96,7 @@ async def update_user(
         )
 
 
-@router.delete('/{user_id}')
+@router.delete('/{user_id}', status_code=HTTPStatus.NO_CONTENT)
 async def delete_user(user_id: str, session: Session, current_user: Current_User):
     db_user = await session.scalar(
         select(User).where(
@@ -112,5 +112,3 @@ async def delete_user(user_id: str, session: Session, current_user: Current_User
 
     await session.delete(db_user)
     await session.commit()
-
-    return {'detail': 'User deleted.'}

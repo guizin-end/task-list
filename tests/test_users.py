@@ -174,8 +174,7 @@ def test_delete_user(client, user, auth_headers):
         headers=auth_headers,
     )
 
-    assert response.status_code == HTTPStatus.OK
-    assert response.json() == {'detail': 'User deleted.'}
+    assert response.status_code == HTTPStatus.NO_CONTENT
 
 
 def test_delete_user_not_found(client, mock_get_current_user):
