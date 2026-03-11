@@ -52,9 +52,9 @@ async def get_todos(
         exclude_none=True, exclude={'limit', 'offset'}
     ).items():
         if key == 'title':
-            params.append(getattr(Todo, key).contains(getattr(filter_query, key)))
+            params.append(getattr(Todo, key).contains(value))
         else:
-            params.append(getattr(Todo, key) == getattr(filter_query, key))
+            params.append(getattr(Todo, key) == value)
 
     return await session.scalars(
         select(Todo)
