@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     TODO_TRASH_EXPIRE_DAYS: int
     TODO_TRASH_CLEANUP_INTERVAL_DAYS: int
 
+    LOGIN_ATTEMPTS_LIMIT: int
+    LOGIN_LOCKOUT_TIME: int
+
 
 @lru_cache()
 def get_settings() -> Settings:

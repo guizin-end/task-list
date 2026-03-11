@@ -1,5 +1,6 @@
 import os
 
+import fakeredis
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
@@ -95,6 +96,13 @@ async def client(session):
         yield client
 
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def mock_redis(monkeypatch):
+    fake_redis = fakeredis.aioredis.FakeRedis()
+    monkeypatch.setattr('app.routers.auth.r', fake_redis)
+    return fake_redis
 
 
 def create_user(payload, client):
