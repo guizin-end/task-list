@@ -16,6 +16,8 @@ celery_app.conf.update(
     enable_utc=True,
     task_acks_late=True,
     task_reject_on_worker_lost=True,
+    beat_scheduler='redbeat.RedBeatScheduler',
+    redbeat_redis_url=settings.CELERY_RESULT_BACKEND,
     beat_schedule={
         'cleanup_tasks': {
             'task': 'app.tasks.cleanup_tasks.trash_cleaner',
