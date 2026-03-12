@@ -1,6 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field
+import enum
 
-from app.models import TodoStatus, TodoStatusPublic
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserSchema(BaseModel):
@@ -19,6 +19,27 @@ class UserUpdate(BaseModel):
     username: str | None = None
     email: EmailStr | None = None
     password: str | None = None
+
+
+class TodoStatus(str, enum.Enum):
+    DRAFT = 'DRAFT'
+    ACTIVE = 'ACTIVE'
+    PENDING = 'PENDING'
+    COMPLETED = 'COMPLETED'
+    TRASH = 'TRASH'
+
+
+class TodoStatusPublic(str, enum.Enum):
+    DRAFT = 'DRAFT'
+    ACTIVE = 'ACTIVE'
+    PENDING = 'PENDING'
+    COMPLETED = 'COMPLETED'
+
+
+class TodoStatusCreate(str, enum.Enum):
+    DRAFT = 'DRAFT'
+    ACTIVE = 'ACTIVE'
+    PENDING = 'PENDING'
 
 
 class TodoSchema(BaseModel):

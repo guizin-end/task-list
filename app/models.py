@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import enum
 from datetime import datetime
 from typing import List
 
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
+
+from app.schemas import TodoStatus
 
 table_registry = registry()
 
@@ -31,27 +32,6 @@ class User:
         lazy='selectin',
         cascade='all, delete-orphan',
     )
-
-
-class TodoStatus(str, enum.Enum):
-    DRAFT = 'DRAFT'
-    ACTIVE = 'ACTIVE'
-    PENDING = 'PENDING'
-    COMPLETED = 'COMPLETED'
-    TRASH = 'TRASH'
-
-
-class TodoStatusPublic(str, enum.Enum):
-    DRAFT = 'DRAFT'
-    ACTIVE = 'ACTIVE'
-    PENDING = 'PENDING'
-    COMPLETED = 'COMPLETED'
-
-
-class TodoStatusCreate(str, enum.Enum):
-    DRAFT = 'DRAFT'
-    ACTIVE = 'ACTIVE'
-    PENDING = 'PENDING'
 
 
 @table_registry.mapped_as_dataclass
