@@ -98,17 +98,14 @@ async def update_user(
 
 @router.delete('/{user_id}', status_code=HTTPStatus.NO_CONTENT)
 async def delete_user(user_id: str, session: Session, current_user: Current_User):
+    if user_id != current_user.id:
+        raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail='Not allowed.')
+
     db_user = await session.scalar(
         select(User).where(
             User.id == user_id,
-            User.id == current_user.id,
         )
     )
-
-    if not db_user:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User does not exist.'
-        )
 
     await session.delete(db_user)
     await session.commit()
