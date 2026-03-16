@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from app.schemas import UserPublic
-from tests.conftest import users_payload
+from tests.conftest import false_id, users_payload
 
 
 def test_create_user(client):
@@ -77,7 +77,7 @@ def test_get_user_by_id(client, user):
 
 
 def test_get_user_by_id_not_found(client):
-    response = client.get('/users/false-id-1')
+    response = client.get(f'/users/{false_id}')
 
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == {'detail': 'User does not exist.'}
@@ -160,7 +160,7 @@ def test_update_user_not_found(
     mock_get_current_user,
 ):
     response = client.patch(
-        '/users/false-id-1',
+        f'/users/{false_id}',
         json=users_payload[1],
     )
 
@@ -179,8 +179,8 @@ def test_delete_user(client, user, auth_headers):
 
 def test_delete_user_not_found(client, mock_get_current_user):
     response = client.delete(
-        '/users/false-id-1',
+        f'/users/{false_id}',
     )
 
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'User does not exist.'}
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not allowed.'}

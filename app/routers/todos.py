@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from typing import Annotated
-from uuid import uuid4
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import delete, select
@@ -36,7 +35,6 @@ async def create_todo(
     todo_status: TodoStatusCreate = TodoStatusPublic.DRAFT.value,
 ):
     db_todo = Todo(
-        id=str(uuid4()),
         title=new_todo.title,
         description=new_todo.description,
         status=todo_status.value,

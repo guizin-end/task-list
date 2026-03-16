@@ -17,6 +17,8 @@ from app.models import table_registry
 from app.schemas import UserPublic
 from app.security import get_current_user
 
+false_id = '11111111-1111-1111-1111-111111111111'
+
 users_payload = [
     {
         'username': 'alice',

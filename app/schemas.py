@@ -1,4 +1,5 @@
 import enum
+import uuid
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -10,7 +11,7 @@ class UserSchema(BaseModel):
 
 
 class UserPublic(BaseModel):
-    id: str
+    id: uuid.UUID
     username: str
     email: EmailStr
 
@@ -48,7 +49,7 @@ class TodoSchema(BaseModel):
 
 
 class TodoPublic(TodoSchema):
-    id: str
+    id: uuid.UUID
     status: TodoStatus
 
 

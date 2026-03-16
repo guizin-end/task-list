@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import ForeignKey, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column, registry, relationship
 
 from app.schemas import TodoStatus
@@ -15,12 +16,13 @@ table_registry = registry()
 class User:
     __tablename__ = 'users'
 
-    id: Mapped[str] = mapped_column(primary_key=True)
-
     username: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str] = mapped_column(nullable=False, repr=False)
 
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, insert_default=uuid.uuid4, default_factory=uuid.uuid4
+    )
     created_at: Mapped[datetime] = mapped_column(init=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now(), onupdate=func.now()
@@ -38,8 +40,7 @@ class User:
 class Todo:
     __tablename__ = 'todos'
 
-    id: Mapped[str] = mapped_column(primary_key=True)
-    user_id: Mapped[str] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('users.id'))
 
     title: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=True)
@@ -48,6 +49,9 @@ class Todo:
         server_default=TodoStatus.DRAFT,
     )
 
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, insert_default=uuid.uuid4, default_factory=uuid.uuid4
+    )
     created_at: Mapped[datetime] = mapped_column(init=False, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now(), onupdate=func.now()

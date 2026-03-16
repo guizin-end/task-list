@@ -1,6 +1,6 @@
+import uuid
 from http import HTTPStatus
 from typing import Annotated
-from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -21,7 +21,6 @@ Current_User = Annotated[User, Depends(get_current_user)]
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
 async def create_user(new_user: UserSchema, session: Session):
     db_user = User(
-        id=str(uuid4()),
         username=new_user.username,
         email=new_user.email,
         password=get_password_hash(new_user.password),
@@ -50,7 +49,7 @@ async def get_me(current_user: Current_User):
 
 
 @router.get('/{user_id}', response_model=UserPublic)
-async def get_user_by_id(user_id: str, session: Session):
+async def get_user_by_id(user_id: uuid.UUID, session: Session):
     db_user = await session.scalar(select(User).where(User.id == user_id))
 
     if not db_user:
@@ -63,7 +62,7 @@ async def get_user_by_id(user_id: str, session: Session):
 
 @router.patch('/{user_id}', response_model=UserPublic)
 async def update_user(
-    user_id: str, user: UserUpdate, session: Session, current_user: Current_User
+    user_id: uuid.UUID, user: UserUpdate, session: Session, current_user: Current_User
 ):
     db_user = await session.scalar(
         select(User).where(
@@ -97,7 +96,7 @@ async def update_user(
 
 
 @router.delete('/{user_id}', status_code=HTTPStatus.NO_CONTENT)
-async def delete_user(user_id: str, session: Session, current_user: Current_User):
+async def delete_user(user_id: uuid.UUID, session: Session, current_user: Current_User):
     if user_id != current_user.id:
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail='Not allowed.')
 
