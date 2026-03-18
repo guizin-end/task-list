@@ -11,12 +11,12 @@ from app.models import Todo, TodoStatus, User
 from app.security import get_current_user
 
 Session = Annotated[AsyncSession, Depends(get_session)]
-Current_User = Annotated[User, Depends(get_current_user)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 async def get_valid_todo(
     session: Session,
-    current_user: Current_User,
+    current_user: CurrentUser,
     todo_id_or_title: str,
 ):
     try:

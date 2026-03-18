@@ -15,7 +15,7 @@ from app.security import get_current_user, get_password_hash
 router = APIRouter(prefix='/users', tags=['users'])
 
 Session = Annotated[AsyncSession, Depends(get_session)]
-Current_User = Annotated[User, Depends(get_current_user)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
@@ -44,7 +44,7 @@ async def get_users(session: Session):
 
 
 @router.get('/me', response_model=UserPublic)
-async def get_me(current_user: Current_User):
+async def get_me(current_user: CurrentUser):
     return current_user
 
 
@@ -62,7 +62,7 @@ async def get_user_by_id(user_id: uuid.UUID, session: Session):
 
 @router.patch('/{user_id}', response_model=UserPublic)
 async def update_user(
-    user_id: uuid.UUID, user: UserUpdate, session: Session, current_user: Current_User
+    user_id: uuid.UUID, user: UserUpdate, session: Session, current_user: CurrentUser
 ):
     db_user = await session.scalar(
         select(User).where(
@@ -96,7 +96,7 @@ async def update_user(
 
 
 @router.delete('/{user_id}', status_code=HTTPStatus.NO_CONTENT)
-async def delete_user(user_id: uuid.UUID, session: Session, current_user: Current_User):
+async def delete_user(user_id: uuid.UUID, session: Session, current_user: CurrentUser):
     if user_id != current_user.id:
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail='Not allowed.')
 

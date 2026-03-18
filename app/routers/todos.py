@@ -22,16 +22,16 @@ from app.security import get_current_user
 router = APIRouter(prefix='/todos', tags=['todos'])
 
 Session = Annotated[AsyncSession, Depends(get_session)]
-Current_User = Annotated[User, Depends(get_current_user)]
-Db_Todo = Annotated[Todo, Depends(get_valid_todo)]
-Filter_Query = Annotated[FilterParamsTodos, Query()]
+CurrentUser = Annotated[User, Depends(get_current_user)]
+DbTodo = Annotated[Todo, Depends(get_valid_todo)]
+FilterQuery = Annotated[FilterParamsTodos, Query()]
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=TodoPublic)
 async def create_todo(
     new_todo: TodoSchema,
     session: Session,
-    current_user: Current_User,
+    current_user: CurrentUser,
     todo_status: TodoStatusCreate = TodoStatusPublic.DRAFT.value,
 ):
     db_todo = Todo(
@@ -49,8 +49,8 @@ async def create_todo(
 @router.get('/', response_model=list[TodoPublic])
 async def get_todos(
     session: Session,
-    current_user: Current_User,
-    filter_query: Filter_Query,
+    current_user: CurrentUser,
+    filter_query: FilterQuery,
 ):
     params = [Todo.user_id == current_user.id]
 
@@ -73,7 +73,7 @@ async def get_todos(
 @router.get('/trash', response_model=list[TodoPublic])
 async def get_deleted_todos(
     session: Session,
-    current_user: Current_User,
+    current_user: CurrentUser,
 ):
     return await session.scalars(
         select(Todo).where(
@@ -86,7 +86,7 @@ async def get_deleted_todos(
 @router.delete('/trash', status_code=HTTPStatus.NO_CONTENT)
 async def empty_user_todo_trash(
     session: Session,
-    current_user: Current_User,
+    current_user: CurrentUser,
 ):
     await session.execute(
         delete(Todo).where(
@@ -100,7 +100,7 @@ async def empty_user_todo_trash(
 @router.patch('/{todo_id_or_title}/status', response_model=TodoPublic)  # noqa: FAST003
 async def update_todo_status(
     status: TodoStatusPublic,
-    db_todo: Db_Todo,
+    db_todo: DbTodo,
     session: Session,
 ):
     db_todo.status = TodoStatus(status.value)
@@ -113,7 +113,7 @@ async def update_todo_status(
 @router.patch('/{todo_id_or_title}', response_model=TodoPublic)  # noqa: FAST003
 async def update_todo_data(
     new_todo_data: TodoUpdate,
-    db_todo: Db_Todo,
+    db_todo: DbTodo,
     session: Session,
 ):
     for key, value in new_todo_data.model_dump(exclude_none=True).items():
@@ -127,7 +127,7 @@ async def update_todo_data(
 
 @router.delete('/{todo_id_or_title}', status_code=HTTPStatus.NO_CONTENT)  # noqa: FAST003
 async def delete_todo(
-    db_todo: Db_Todo,
+    db_todo: DbTodo,
     session: Session,
 ):
     db_todo.status = TodoStatus.TRASH
