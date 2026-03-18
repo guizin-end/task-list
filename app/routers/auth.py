@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_session
 from app.models import User
 from app.security import authenticate_user, create_access_token, get_current_user
-from app.settings import Settings
+from app.settings import get_settings
 
 Session = Annotated[AsyncSession, Depends(get_session)]
 AuthForm = Annotated[OAuth2PasswordRequestForm, Depends()]
@@ -19,7 +19,7 @@ router = APIRouter(prefix='/auth', tags=['auth'])
 
 
 r = Redis(host='redis', port=6379, decode_responses=True)
-settings = Settings()
+settings = get_settings()
 
 
 @router.post('/token')

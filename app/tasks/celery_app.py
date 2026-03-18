@@ -1,9 +1,9 @@
 from celery import Celery
 from celery.schedules import crontab
 
-from app.settings import Settings
+from app.settings import get_settings
 
-settings = Settings()
+settings = get_settings()
 
 
 celery_app = Celery(

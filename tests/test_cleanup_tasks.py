@@ -3,10 +3,10 @@ from http import HTTPStatus
 
 import freezegun
 
-from app.settings import Settings
+from app.settings import get_settings
 from app.tasks.cleanup_tasks import trash_cleaner
 
-settings = Settings()
+settings = get_settings()
 
 
 TRASH_URL = '/todos/trash'
