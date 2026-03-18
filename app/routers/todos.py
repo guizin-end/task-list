@@ -9,7 +9,7 @@ from app.database import get_session
 from app.dependencies import get_valid_todo
 from app.models import Todo, User
 from app.schemas import (
-    FilterParamsTodos,
+    TodoFilterQuery,
     TodoPublic,
     TodoSchema,
     TodoStatus,
@@ -24,7 +24,7 @@ router = APIRouter(prefix='/todos', tags=['todos'])
 Session = Annotated[AsyncSession, Depends(get_session)]
 CurrentUser = Annotated[User, Depends(get_current_user)]
 DbTodo = Annotated[Todo, Depends(get_valid_todo)]
-FilterQuery = Annotated[FilterParamsTodos, Query()]
+TodoFilterQuery = Annotated[TodoFilterQuery, Query()]
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=TodoPublic)
@@ -50,11 +50,11 @@ async def create_todo(
 async def get_todos(
     session: Session,
     current_user: CurrentUser,
-    filter_query: FilterQuery,
+    todo_filter_query: TodoFilterQuery,
 ):
     params = [Todo.user_id == current_user.id]
 
-    for key, value in filter_query.model_dump(
+    for key, value in todo_filter_query.model_dump(
         exclude_none=True, exclude={'limit', 'offset'}
     ).items():
         if key == 'title':
@@ -65,8 +65,8 @@ async def get_todos(
     return await session.scalars(
         select(Todo)
         .where(*params)
-        .offset(filter_query.offset)
-        .limit(filter_query.limit)
+        .offset(todo_filter_query.offset)
+        .limit(todo_filter_query.limit)
     )
 
 

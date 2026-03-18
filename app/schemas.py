@@ -63,7 +63,7 @@ class FilterParams(BaseModel):
     offset: int = Field(0, ge=0)
 
 
-class FilterParamsTodos(FilterParams):
+class TodoFilterQuery(FilterParams):
     title: str | None = Field(None, min_length=3, max_length=20)
     description: str | None = Field(None, max_length=20)
     status: TodoStatusPublic | None = None
