@@ -6,7 +6,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
-from app.dependencies import get_valid_todo
+from app.dependencies import get_current_user, get_valid_todo
 from app.models import Todo, User
 from app.schemas import (
     TodoFilterQuery,
@@ -17,7 +17,6 @@ from app.schemas import (
     TodoStatusPublic,
     TodoUpdate,
 )
-from app.security import get_current_user
 
 router = APIRouter(prefix='/todos', tags=['todos'])
 

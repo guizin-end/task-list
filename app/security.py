@@ -62,28 +62,3 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, settings.ALGORITHM)
 
     return encoded_jwt
-
-
-async def get_current_user(token: Token, session: Session):
-    credentials_exception = HTTPException(
-        status_code=HTTPStatus.UNAUTHORIZED,
-        detail='Could not validate credentials',
-        headers={'WWW-Authenticate': 'Bearer'},
-    )
-
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, settings.ALGORITHM)
-
-        username = payload.get('sub')
-        if not username:
-            raise credentials_exception
-
-    except jwt.ExpiredSignatureError, jwt.DecodeError, jwt.InvalidTokenError:
-        raise credentials_exception
-
-    user = await session.scalar(select(User).where(User.email == username))
-
-    if not user:
-        raise credentials_exception
-
-    return user

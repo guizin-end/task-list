@@ -12,10 +12,10 @@ from sqlalchemy.pool import StaticPool
 os.environ.setdefault('DATABASE_URL', 'sqlite+aiosqlite:///tests/test.db')
 
 from app.database import get_session
+from app.dependencies import get_current_user
 from app.main import app
 from app.models import table_registry
 from app.schemas import UserPublic
-from app.security import get_current_user
 
 false_id = '11111111-1111-1111-1111-111111111111'
 

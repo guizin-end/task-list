@@ -8,9 +8,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
+from app.dependencies import get_current_user
 from app.models import User
 from app.schemas import UserPublic, UserSchema, UserUpdate
-from app.security import get_current_user, get_password_hash
+from app.security import get_password_hash
 
 router = APIRouter(prefix='/users', tags=['users'])
 
